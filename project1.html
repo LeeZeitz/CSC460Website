@@ -94,7 +94,7 @@
     <article>
         <div class="container">
             <div class="row">
-                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1">
 
                     <h2 class="section-heading">Introduction</h2>
                     <p>The objective of this project is to start familiarizing ourselves with programming real time systems using a time-based architecture, and interfacing with peripherals using an Arduino microcontroller. Some of the peripherals include photo transistors, servo motors, light emitting diodes (LED), an lcd display, and bluetooth modules.</p>
@@ -293,7 +293,7 @@
                         <img class="img-responsive" src="img/phase1_wiring.jpg" alt="">
                     </a>
                     <span class="caption text-muted">Figure 5: Phase 1 Complete Wiring Diagram</span>
-                
+
 
 
                     <h2>Software</h2>
@@ -319,9 +319,180 @@
                     <p>An issue that we encountered when programming the LCD shield was incorrect characters being rapidly printed to the screen. While this initially appeared related to the frequency of screen updates, in reality it was caused by an unnoticed buffer overflow when formating the joystick data to be printed. This bug highlights the difficulty in debugging embedded code.</p>
 
                     
+                    <h1>Phase 2</h1>
+                    <p>The major change in the second phase of this project involved the addition of wireless communication of joystick information via bluetooth. This required that the single station from phase one be split into a separate base station and remote station that would interface with bluetooth.</p>
+                    <p>The base station was required to have the joystick, LCD screen, photocell, and a bluetooth master module. The remote station contained the servo motors, laser, and a bluetooth slave module. The base station read in the values from the joystick X and Y axis and button, and the photocell, wrote them to the LCD screen, and sent the data to the remote station. With that data, the remote station controls the output peripherals (servos and laser) accordingly.</p>
+                    <p>In addition, both the base and remote stations were required to schedule their tasks using a Time-Triggered Scheduler (TTS) instead of a polling loop. The frequency and periods of each tasks were considered carefully, with the objective of minimizing CPU utilization, while maintaining full functionality.</p>
                     
+                    <h2>Hardware</h2>
+                    <p>The only hardware that had to change from phase one to phase two, with the exception of moving some of the peripherals over to another breadboard and Arduino, is the inclusion of the bluetooth modules. </p>
+                    <p>The extra components for phase 2 are an extra Arduino, an extra breadboard, and two bluetooth HC-05/06 modules.</p>
+                    <p>Wiring diagrams for the complete remote and base stations can be seen in figures 6 and 7 respectively.</p>
+
+                    <a>
+                        <img class="img-responsive" src="img/remote_wiring.jpg" alt="">
+                    </a>
+                    <span class="caption text-muted">Figure 6: Remote Station Complete Wiring Diagram</span>
                     
+                    <a>
+                        <img class="img-responsive" src="img/base_wiring.jpg" alt="">
+                    </a>
+                    <span class="caption text-muted">Figure 7: Base Station Complete Wiring Diagram</span>
                     
+                    <div>
+                        <h3>Bluetooth HC-05/06 Modules</h3>
+                        <p>We configured our HC-06 to be the bluetooth master, and the 05 to be the slave. The configuration process involves setting the name, pin, and role of each module. The commands for each of these configuration steps were provided to us as a reference. </p>
+                        <p>The PIN that is set on these two modules is what tells them to communicate with each other, as opposed to any of the other powered modules in the room at the time. With that in mind, it was important to pick a PIN that other groups would likely not use themselves. </p>
+                        <p>The bluetooth module communicates over UART (serial). The VCC and ground pins connect to the 5V and ground pins of the Arduino. The Rx and Tx pins connect to the Tx1 and Rx1 pins on the Arduino, respectively. This configuration is known as a null-modem configuration, and it what most modern serial devices use.</p>
+                        <a>
+                            <img class="img-responsive" src="img/bt_wiring.jpg" alt="">
+                        </a>
+                        <span class="caption text-muted">Figure 8: HC-05/06 Bluetooth Module Wiring Diagram</span>
+                    </div>
+
+                    <h2>Software</h2>
+                    <p>The tasks outlined in the software section for phase 1 were all re-used for phase 2, with the base station running the joystick, photocell and LCD tasks, and the remote station running the servo and laser tasks. The only additions were the integration of a time-triggered scheduler to reduce cpu utilization and increase performance, and bluetooth tasks on both stations to handle the transmission of packets. A shared packet format was developed so that the remote station could understand the order of the bytes it was receiving.</p>
+            
+                    <div>
+                        <h3>Bluetooth Packet</h3>
+                        <p>In order to account for data potentially being lost during bluetooth transmission, a 4-byte packet structure with an aligning “start” byte was developed to allow for basic error checking. In this way, any data received before the “start” byte will be discarded, as it doesn’t correspond to the agreed-upon packet structure. The below figure illustrates the structure of the bluetooth packet and the data contained by each byte. The scaling of the joystick values to servo angles from phase 1 was moved into the base station’s joystick task for phase 2. Because the commanded absolute position of the servo is only in the range 0-180, this allowed us to encode the servo position into a single byte.</p>
+                        <table>
+                            <tr>
+                                <th>Byte 0</th>
+                                <th>Byte 1</th>
+                                <th>Byte 2</th>
+                                <th>Byte 3</th>
+                            </tr>
+                            <tr class="table-content">
+                                <th>Start Byte = 'S'</th>
+                                <th>Joystick Button Value = (0 or 1)</th>
+                                <th>Pan Angle = (0 - 180)</th>
+                                <th>Tilt Angle = (0 - 180)</th>
+                            </tr>
+                        </table>
+                        <span class="caption text-muted">Figure 9: Bluetooth Packet Structure</span>
+                        <p>Initially, a separate “start” and “stop” byte was used for each packet, but we discovered that because the error-rate was so low, a single aligning byte was sufficient for the purposes of short-range bluetooth communication. Because the packets are almost always consecutive, the trailing “stop” byte would be immediately succeeded by a “start” byte and was therefore redundant. </p>
+                    </div>
+
+                    <h3>Bluetooth Tasks</h3>
+                    <p>Both station’s bluetooth tasks used the Arduino Serial functions to communicate with the bluetooth chips via UART. The task on the base station simply copied the data produced by the other tasks into a packet format and set the entire 4-byte packet at once. However, the remote station task followed a more complicated procedure to ensure data integrity. It discards any data received before the agreed-upon starting byte then reads the packet only if at least a 4-bytes of data is available in the hardware UART buffers.</p>
+                    <p>We initially considered reading the bluetooth data byte-by byte, with a lower task frequency, to avoid blocking in the bluetooth task to wait for a full packet of data. However, because there is a hardware buffer that automatically stores received UART data, we found that this was actually unnecessary. The Arduino serial library allows the user to check how many unread bytes have been received, meaning that the bluetooth task on our remote station will only read the data if at least 4-bytes (one packet worth) has been received. Otherwise it will immediately return without ever blocking. This greatly reduced CPU utilization. </p>
+
+                    <h3>Time Triggered Scheduler</h3>
+                    <p>The Time Triggered Scheduler required that the period and phase of each task be manually specified so that the system ran smoothly but CPU utilization was minimized. Because the software tasks for phase 2 required very little CPU time to execute, our first estimations for scheduler period and phase ended up meeting these requirements.</p>
+                    <p>The below sections detail the logic behind the timing chosen for each station, as well as the analysis of the timing using a logic analyzer. Separate digital pins for each task were raised and lowered each time a task was scheduled and returned respectively, so that their runtime could be easily seen on the logic analyzer.</p>
+
+                    <h3>Base Station</h3>
+                    <p>The timing of the overall system was largely dependent on the sampling rate of the joystick, as the joystick was the primary input device that determined the action of the rest of the system. Because it is unrealistic for joystick inputs to happen faster than 10 times per second (Hz), a scheduling period of 20 Hz, corresponding to a period of 50 ms was chosen for the task that read the joystick values. Based on this, the bluetooth task period was set at half this, to ensure that each change in joystick value was captured appropriately. The other tasks were then set to multiples of the joystick period; the LCD had a longer period as it was not necessary to update the screen faster than can be perceived. The offsets were widely spaced to ensure that none of the tasks overlapped. Figure X shows the logic analyzer results for the base station while Table 1 indicates the corresponding channel mappings and periods/offsets for the logic analyzer screenshots.</p>
+                    <p>Longer periods were experimented with to further reduce cpu utilization. However, we found that increasing the period of the LCD task beyond 100ms introduced undesirable latency in the position indications of the joysticks. Furthemore, decreasing the sampling rate of the joysticks caused the movement of the servos to be imprecise, as there was a larger amount of latency in the system. </p>
+
+                    <a>
+                        <img class="img-responsive" src="img/base_logic.jpg" alt="">
+                    </a>
+                    <span class="caption text-muted">Figure 9: Base Station Timing Analysis</span>
+
+                    <table>
+                        <tr>
+                            <th colspan="5">Base</th>
+                        </tr>
+                        <tr>
+                            <th>Channel</th>
+                            <th>Task</th>
+                            <th>Period (ms)</th>
+                            <th>Offset (ms)</th>
+                            <th>Average Execution Time (μs)</th>
+                        </tr>
+                        <tr>
+                            <td>0</td>
+                            <td>Write to LCD</td>
+                            <td>100</td>
+                            <td>0</td>
+                            <td>3500</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Read Light Sensor</td>
+                            <td>25</td>
+                            <td>20</td>
+                            <td>110</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Transmit over Bluetooth</td>
+                            <td>25</td>
+                            <td>15</td>
+                            <td>30</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Read Joystick Values</td>
+                            <td>50</td>
+                            <td>10</td>
+                            <td>32</td>
+                        </tr>
+                    </table>
+                    <span class="caption text-muted">Table 1: Base Station Timing</span>
+                    <p>The timing analysis clearly showed that there was no overlap or timing jitter, and that CPU utilization was very low, with each tasks execution time being a small fraction if its period. The LCD task by far took the most amount of time, but also had the longest period. The total CPU utilization for the base station can therefore be calculated with the following equation.</p>
+                    <a>
+                        <img class="img-responsive" src="img/util.png" alt="">
+                    </a>
+                    <span class="caption text-muted">Figure 10: CPU Utilization Calculation</span>
+                    <p>For the base station this yields a CPU utilization of approximately 4.1 %, which is extremely low, as desired.</p>
+
+                    <h3>Remote Station</h3>
+                    <p>Since the remote station only received data from the base station and did not transmit, the scheduling periods were chosen based on the decisions already made for the base station. The period of the bluetooth task was set to 25 ms to match that of the base station, and ensure that packets were read at the same rate they entered the buffer. The periods of the servo and laser tasks were set to match the period of the bluetooth task as it was not possible for their state to change any faster than the information in the bluetooth packets is received. Figure X and table 2 show similar logic analyzer results as for the base station.</p>
+                    <a>
+                        <img class="img-responsive" src="img/remote_logic.png" alt="">
+                    </a>
+                    <span class="caption text-muted">Figure 11: Remote Station Timing Analysis</span>
+
+                    <table>
+                        <tr>
+                            <th colspan="5">Remote</th>
+                        </tr>
+                        <tr>
+                            <th>Channel</th>
+                            <th>Task</th>
+                            <th>Period (ms)</th>
+                            <th>Offset (ms)</th>
+                            <th>Average Execution Time (μs)</th>
+                        </tr>
+                        <tr>
+                            <td>0</td>
+                            <td>Set Laser</td>
+                            <td>25</td>
+                            <td>15</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Set Servose</td>
+                            <td>25</td>
+                            <td>20</td>
+                            <td>106</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Read from Bluetooth</td>
+                            <td>25</td>
+                            <td>0</td>
+                            <td>20</td>
+                        </tr>
+                    </table>
+                    <span class="caption text-muted">Table 2: Remote Station Timing</span>
+                    
+                    <p>If CPU utilization is calculated using the same equation as above, we obtain a utilization of 0.54% for the remote station, which is an order of magnitude lower than that of the base station.</p>
+
+
+
+
+
+
+
+
+
+
+
                     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
                     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
                     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
