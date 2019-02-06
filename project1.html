@@ -236,6 +236,10 @@
 
                     <h1>Phase 1</h1>
                     <p>Phase 1 of this project involved controlling hardware from a single base station, using wired connections and a single arduino. The arduino core libraries were used in combination with a single polling loop, without the use of any time-triggered scheduler. Phase 1 required that the pan and tilt motors be controlled by the movement of a joystick, and that the laser be controlled by the clicking of that joystick. It also requires that the photocell recognizes when it is being hit by a laser. The last piece of Phase 1 is displaying the state of the joystick and the photocell on an LCD display. </p>
+                    <a>
+                        <img class="img-responsive" src="img/Phase1.svg" alt="">
+                    </a>
+                    
 
                     <h2>Hardware</h2>
                     <p>The hardware for phase one consists of 3 sources of input: the joysticks analog movements along the X and Y axis, the analog value of the photocell, and the digital state of the joystick’s button. </p>
@@ -324,6 +328,16 @@
                     <p>The base station was required to have the joystick, LCD screen, photocell, and a bluetooth master module. The remote station contained the servo motors, laser, and a bluetooth slave module. The base station read in the values from the joystick X and Y axis and button, and the photocell, wrote them to the LCD screen, and sent the data to the remote station. With that data, the remote station controls the output peripherals (servos and laser) accordingly.</p>
                     <p>In addition, both the base and remote stations were required to schedule their tasks using a Time-Triggered Scheduler (TTS) instead of a polling loop. The frequency and periods of each tasks were considered carefully, with the objective of minimizing CPU utilization, while maintaining full functionality.</p>
                     
+                    <a>
+                        <img class="img-responsive" src="img/Base.svg" alt="">
+                    </a>
+                    <span class="caption text-mutes">Figure 6: Base Station Block Diagram</span>
+
+                    <a>
+                        <img class="img-responsive" src="img/Remote.svg" alt="">
+                    </a>
+                    <span class="caption text-mutes">Figure 7: Remote Station Block Diagram</span>
+
                     <h2>Hardware</h2>
                     <p>The only hardware that had to change from phase one to phase two, with the exception of moving some of the peripherals over to another breadboard and Arduino, is the inclusion of the bluetooth modules. </p>
                     <p>The extra components for phase 2 are an extra Arduino, an extra breadboard, and two bluetooth HC-05/06 modules.</p>
@@ -332,12 +346,12 @@
                     <a>
                         <img class="img-responsive" src="img/remote_wiring.jpg" alt="">
                     </a>
-                    <span class="caption text-muted">Figure 6: Remote Station Complete Wiring Diagram</span>
+                    <span class="caption text-muted">Figure 8: Remote Station Complete Wiring Diagram</span>
                     
                     <a>
                         <img class="img-responsive" src="img/base_wiring.jpg" alt="">
                     </a>
-                    <span class="caption text-muted">Figure 7: Base Station Complete Wiring Diagram</span>
+                    <span class="caption text-muted">Figure 9: Base Station Complete Wiring Diagram</span>
                     
                     <div>
                         <h3>Bluetooth HC-05/06 Modules</h3>
@@ -347,7 +361,7 @@
                         <a>
                             <img class="img-responsive" src="img/bt_wiring.jpg" alt="">
                         </a>
-                        <span class="caption text-muted">Figure 8: HC-05/06 Bluetooth Module Wiring Diagram</span>
+                        <span class="caption text-muted">Figure 10: HC-05/06 Bluetooth Module Wiring Diagram</span>
                     </div>
 
                     <h2>Software</h2>
@@ -370,7 +384,7 @@
                                 <th>Tilt Angle = (0 - 180)</th>
                             </tr>
                         </table>
-                        <span class="caption text-muted">Figure 9: Bluetooth Packet Structure</span>
+                        <span class="caption text-muted">Figure 11: Bluetooth Packet Structure</span>
                         <p>Initially, a separate “start” and “stop” byte was used for each packet, but we discovered that because the error-rate was so low, a single aligning byte was sufficient for the purposes of short-range bluetooth communication. Because the packets are almost always consecutive, the trailing “stop” byte would be immediately succeeded by a “start” byte and was therefore redundant. </p>
                     </div>
 
@@ -387,9 +401,9 @@
                     <p>Longer periods were experimented with to further reduce cpu utilization. However, we found that increasing the period of the LCD task beyond 100ms introduced undesirable latency in the position indications of the joysticks. Furthemore, decreasing the sampling rate of the joysticks caused the movement of the servos to be imprecise, as there was a larger amount of latency in the system. </p>
 
                     <a>
-                        <img class="img-responsive" src="img/base_logic.jpg" alt="">
+                        <img class="img-responsive" src="img/base_logic.png" alt="">
                     </a>
-                    <span class="caption text-muted">Figure 9: Base Station Timing Analysis</span>
+                    <span class="caption text-muted">Figure 12: Base Station Timing Analysis</span>
 
                     <table>
                         <tr>
@@ -436,7 +450,7 @@
                     <a>
                         <img class="img-responsive" src="img/util.png" alt="">
                     </a>
-                    <span class="caption text-muted">Figure 10: CPU Utilization Calculation</span>
+                    <span class="caption text-muted">Figure 13: CPU Utilization Calculation</span>
                     <p>For the base station this yields a CPU utilization of approximately 4.1 %, which is extremely low, as desired.</p>
 
                     <h3>Remote Station</h3>
@@ -444,7 +458,7 @@
                     <a>
                         <img class="img-responsive" src="img/remote_logic.png" alt="">
                     </a>
-                    <span class="caption text-muted">Figure 11: Remote Station Timing Analysis</span>
+                    <span class="caption text-muted">Figure 14: Remote Station Timing Analysis</span>
 
                     <table>
                         <tr>
@@ -484,14 +498,32 @@
                     <p>If CPU utilization is calculated using the same equation as above, we obtain a utilization of 0.54% for the remote station, which is an order of magnitude lower than that of the base station.</p>
 
 
+                    <h1>Conclusion</h1>
+                    <p>The timing analysis done in phase two shows that the time-triggered architecture used to control the devices in this project has the potential to be a simple and reliable basis for implementing an RTOS. Future iterations of the TTS implemented in project two will need mechanisms to handle urgent events and interrupts, start and stop dynamically created tasks and utilize the idle time between periodic tasks.</p>
 
+                    <h1>References</h1>
+                    <p>[1] "Arduino Mega 2560 Rev3", Store.arduino.cc, 2019. [Online]. Available: https://store.arduino.cc/usa/arduino-mega-2560-rev3. [Accessed: 03- Feb- 2019].</p>
+                    <p>[2] "MG90S | Tower Pro", Towerpro.com.tw, 2019. [Online]. Available: https://www.towerpro.com.tw/product/mg90s-3/. [Accessed: 03- Feb- 2019].</p>
+                    <p>[3] "Lab Guide: Time-Triggered Scheduling | Neil's Log Book", Nrqm.ca, 2019. [Online]. Available: https://nrqm.ca/mechatronics-lab-guide/lab-guide-time-triggered-scheduling/. [Accessed: 06- Feb- 2019].</p>
+                    <p>[4] "Arduino PS2 Joystick Tutorial: Keyes KY-023 Deek Robot", Henry's Bench, 2019. [Online]. Available: http://henrysbench.capnfatz.com/henrys-bench/arduino-sensors-and-input/arduino-ps2-joystick-tutorial-keyes-ky-023-deek-robot/. [Accessed: 04- Feb- 2019].</p>
 
-
-
-
-
-
-
+                    <h1>Appendix A: Overview Photos</h1>
+                    <br><br>
+                    <a>
+                        <img class="img-responsive" src="img/overview_photo3.jpg" alt="">
+                    </a>
+                    <span class="caption text-muted">Figure 15: Phase 1 Prior to Demo</span>
+                    <br><br><br>
+                    <a>
+                        <img class="img-responsive" src="img/overview_photo1.jpg" alt="">
+                    </a>
+                    <span class="caption text-muted">Figure 16: Remote Station Prior to Demo</span>
+                    <br><br><br>
+                    <a>
+                        <img class="img-responsive" src="img/overview_photo3.jpg" alt="">
+                    </a>
+                    <span class="caption text-muted">Figure 17: Base Station Prior to Demo</span>
+                    <br><br><br>
 
                     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
                     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
@@ -500,10 +532,6 @@
                     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
                     <blockquote>The dreams of yesterday are the hopes of today and the reality of tomorrow. Science has not yet mastered prophecy. We predict too much for the next year and yet far too little for the next ten.</blockquote>
 
-                    <a href="#">
-                        <img class="img-responsive" src="img/post-sample-image.jpg" alt="">
-                    </a>
-                    <span class="caption text-muted">To go places and do things that have never been done before – that’s what living is all about.</span>
                 </div>
             </div>
         </div>
