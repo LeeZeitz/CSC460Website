@@ -335,7 +335,7 @@
                     <h2>Hardware</h2>
                     <p>The only hardware that had to change from phase one to phase two, with the exception of moving some of the peripherals over to another breadboard and Arduino, is the inclusion of the bluetooth modules. </p>
                     <p>The extra components for phase 2 are an extra Arduino, an extra breadboard, and two bluetooth HC-05/06 modules.</p>
-                    <p>Wiring diagrams for the complete remote and base stations can be seen in figures 6 and 7 respectively.</p>
+                    <p>Wiring diagrams for the complete remote and base stations can be seen in figures 8 and 9 respectively.</p>
 
                     <a>
                         <img class="img-responsive" src="img/remote_wiring.jpg" alt="">
@@ -391,7 +391,7 @@
                     <p>The below sections detail the logic behind the timing chosen for each station, as well as the analysis of the timing using a logic analyzer. Separate digital pins for each task were raised and lowered each time a task was scheduled and returned respectively, so that their runtime could be easily seen on the logic analyzer.</p>
 
                     <h3>Base Station</h3>
-                    <p>The timing of the overall system was largely dependent on the sampling rate of the joystick, as the joystick was the primary input device that determined the action of the rest of the system. Because it is unrealistic for joystick inputs to happen faster than 10 times per second (Hz), a scheduling period of 20 Hz, corresponding to a period of 50 ms was chosen for the task that read the joystick values. Based on this, the bluetooth task period was set at half this, to ensure that each change in joystick value was captured appropriately. The other tasks were then set to multiples of the joystick period; the LCD had a longer period as it was not necessary to update the screen faster than can be perceived. The offsets were widely spaced to ensure that none of the tasks overlapped. Figure X shows the logic analyzer results for the base station while Table 1 indicates the corresponding channel mappings and periods/offsets for the logic analyzer screenshots.</p>
+                    <p>The timing of the overall system was largely dependent on the sampling rate of the joystick, as the joystick was the primary input device that determined the action of the rest of the system. Because it is unrealistic for joystick inputs to happen faster than 10 times per second (Hz), a scheduling period of 20 Hz, corresponding to a period of 50 ms was chosen for the task that read the joystick values. Based on this, the bluetooth task period was set at half this, to ensure that each change in joystick value was captured appropriately. The other tasks were then set to multiples of the joystick period; the LCD had a longer period as it was not necessary to update the screen faster than can be perceived. The offsets were widely spaced to ensure that none of the tasks overlapped. Figure 12 shows the logic analyzer results for the base station while Table 1 indicates the corresponding channel mappings and periods/offsets for the logic analyzer screenshots.</p>
                     <p>Longer periods were experimented with to further reduce cpu utilization. However, we found that increasing the period of the LCD task beyond 100ms introduced undesirable latency in the position indications of the joysticks. Furthemore, decreasing the sampling rate of the joysticks caused the movement of the servos to be imprecise, as there was a larger amount of latency in the system. </p>
 
                     <a>
@@ -448,7 +448,7 @@
                     <p>For the base station this yields a CPU utilization of approximately 4.1 %, which is extremely low, as desired.</p>
 
                     <h3>Remote Station</h3>
-                    <p>Since the remote station only received data from the base station and did not transmit, the scheduling periods were chosen based on the decisions already made for the base station. The period of the bluetooth task was set to 25 ms to match that of the base station, and ensure that packets were read at the same rate they entered the buffer. The periods of the servo and laser tasks were set to match the period of the bluetooth task as it was not possible for their state to change any faster than the information in the bluetooth packets is received. Figure X and table 2 show similar logic analyzer results as for the base station.</p>
+                    <p>Since the remote station only received data from the base station and did not transmit, the scheduling periods were chosen based on the decisions already made for the base station. The period of the bluetooth task was set to 25 ms to match that of the base station, and ensure that packets were read at the same rate they entered the buffer. The periods of the servo and laser tasks were set to match the period of the bluetooth task as it was not possible for their state to change any faster than the information in the bluetooth packets is received. Figure 14 and table 2 show similar logic analyzer results as for the base station.</p>
                     <a>
                         <img class="img-responsive" src="img/remote_logic.png" alt="">
                     </a>
