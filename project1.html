@@ -120,16 +120,131 @@
                     </ul>
 
 
-                    <h3>Arduino Mega 2560</h3>
-                    <ul>
-                        <li>Operating Voltage	5V</li>
-                        <li>Input Voltage (recommended)	7-12V</li>
-                        <li>Input Voltage (limit)	6-20V</li>
-                        <li>Digital I/O Pins	54 (of which 15 provide PWM output)</li>
-                        <li>Analog Input Pins	16</li>
-                        <li>DC Current per I/O Pin	20 mA</li>
-                        <li>DC Current for 3.3V Pin	50 mA</li>
-                    </ul>
+                    <div>
+                        <h3>Arduino Mega 2560</h3>
+                        <p>The Arduino Mega is a multi-purpose microprocessor with an abundance of I/O pins, for the biggest and most demanding of projects</p>
+                        <ul>
+                            <li>Operating Voltage	5V</li>
+                            <li>Input Voltage (recommended)	7-12V</li>
+                            <li>Input Voltage (limit)	6-20V</li>
+                            <li>Digital I/O Pins	54 (of which 15 provide PWM output)</li>
+                            <li>Analog Input Pins	16</li>
+                            <li>DC Current per I/O Pin	20 mA</li>
+                            <li>DC Current for 3.3V Pin	50 mA</li>
+                        </ul>
+                        <a href="#">
+                                <img class="img-responsive" src="img/arduino-mega.png" alt="">
+                        </a>
+                    </div>
+
+                    <div>
+                        <h3>Tower Pro MG90S Servo Motors</h3>
+                        <ul>    
+                            <li>Torque(kg)(4.8v)	 1.8</li>
+                            <li>Speed(sec/60deg)	 0.1</li>
+                        </ul>
+                        <a href="#">
+                                <img class="img-responsive" src="img/servo.jpg" alt="">
+                        </a>
+                    </div>
+
+                    <div>
+                        <h3>Laser Diode</h3>
+                        <p>We used a noname laser diode with two leads, a Vin (red wire) and a Ground (blue wire). This laser draws ~15mA, so it can be driven directly by the microcontroller.</p>
+                    </div>
+
+                    <div>
+                        <h3>Pan and Tilt Kit</h3>
+                        <p>We used a 3D printed pan and tilt kit that houses two servo motors, one for each direction. There is also a shelf on the top to mount the laser module.</p>
+                    </div>
+                    <div>
+                        <h3>LCD Shield Display (DFR0009)</h3>
+                        <p>An LCD shield that plugs into the top of the Arduino Mega. Arduino has a library to interface with the display.</p>
+                        <a href="#">
+                                <img class="img-responsive" src="img/lcd-shield.jpg" alt="">
+                        </a>
+                    </div>
+                    
+                    <div>
+                        <h3>PS2 Joystick</h3>
+                        <p>A PS2 joystick is used to control the motion of the pan and tilt servo motors. The range of analog values read from the joystick is 0-1024, both in the x and y direction. The joystick has 5 pins:</p>
+                        <ul>
+                            <li>VCC (5V)</li>
+                            <li>Ground</li>
+                            <li>X-axis</li>
+                            <li>Y-axis</li>
+                            <li>SW (Click)</li>
+                        </ul>
+                        <p>The X- and Y-axis pins output an analog value corresponding to the position of the joystick. The SW pin outputs a digital value corresponding to the state of the button built into the joystick.</p>
+                        <a href="#">
+                                <img class="img-responsive" src="img/ps2-joystick.png" alt="">
+                        </a>
+                    </div>
+                    
+                    <div>
+                        <h3>Power Supply</h3>
+                        <p>The power supply has the option to output either 3.3 or 5 volts, depending on the position of the jumpers on the power supply. It has 4 power pins and 4 ground pins, and is powered via a port that connects to a wall adapter.</p>
+                        <a href="#">
+                                <img class="img-responsive" src="img/power-supply.jpg" alt="">
+                        </a>
+                    </div>
+                    
+                    <div>
+                        <h3>Breadboards</h3>
+                        <p>Given the temporary and iterative nature of this project, breadboards are an ideal candidate for connecting all these hardware components. We used two breadboards, one full sized (60) and one half sized (30 rows).</p>
+                        <a href="#">
+                                <img class="img-responsive" src="img/breadboard.png" alt="">
+                        </a>
+                    </div>
+                    
+                    <div>
+                        <h3>Jumper wires</h3>
+                        <p>Since we used breadboards to connect the hardware components of this project, we also needed to use jumper wires to actually make the connections. Two different kinds of jumper wires were used: male-to-male and male-to-female.</p>
+                        <a href="#">
+                                <img class="img-responsive" src="img/jumper-wires.png" alt="">
+                        </a>
+                    </div>
+                    
+                    <div>
+                        <h3>2 JY-MCU Bluetooth Modules (one HC-06, one HC-05)</h3>
+                        <p>These two bluetooth modules are very similar. They both have versions that come with either 4 or 6 pins. For this project, only 4 pins are used: VCC (5V), Ground, Rx, and Tx. The RX and TX are used for UART communication between the microcontroller and the bluetooth chip. The HC-06 module is able to be configured as either a master or a slave, whereas the HC-05 module does not support the master role and must be used as a slave. Both modules can have their names and PINs configured.</p>
+                        <a href="#">
+                                <img class="img-responsive" src="img/bt-module.jpg" alt="">
+                        </a>
+                    </div>
+
+                    <div>
+                        <h3>Photocell</h3>
+                        <p>A photocell is essentially a resistor whose resistance changes inversely proportional to the amount of light its surface it subjected to. In tandem with a pull-up resistor, the output of a photocell can be read in as an analog input. </p>
+                        <a href="#">
+                                <img class="img-responsive" src="img/photocell.jpg" alt="">
+                        </a>
+                    </div>
+                    <div>
+                        <h3>2 Resistors</h3>
+                        <p>We used two different resistors for project 1, a 1K Ohm and a 10K Ohm. </p>
+                        <a href="#">
+                                <img class="img-responsive" src="img/resistor.png" alt="">
+                        </a>
+                    </div>
+
+                    <h2>Software Overview</h2>
+                    <p>Project 1 uses the core Arduino libraries to interface with the servo motors and avr ADCs, so for the sake of simplicity we used the Arduino IDE to develop and upload the code. The core Arduino libraries are written in C++, so the project implementation is also written in C++; however only C features were used. In addition, the Time Triggered Scheduler (TTS) from the UVic mechatronics lab website was incorporated into phase 2 [3].</p>
+                    <p>Git was used to facilitate collaboration when implementing the software for Project 1. </p>
+                    <p>The software sections of Phase 1 and Phase 2 go into more detail about the types of problems solved using software and the methods used to solve them, as well as some of the fundamental design decisions made throughout the implementation of Project 1.</p>
+
+
+                    <h1>Phase 1</h1>
+                    <p>Phase 1 of this project involved controlling hardware from a single base station, using wired connections and a single arduino. The arduino core libraries were used in combination with a single polling loop, without the use of any time-triggered scheduler. Phase 1 required that the pan and tilt motors be controlled by the movement of a joystick, and that the laser be controlled by the clicking of that joystick. It also requires that the photocell recognizes when it is being hit by a laser. The last piece of Phase 1 is displaying the state of the joystick and the photocell on an LCD display. </p>
+
+                    <h2>Hardware</h2>
+                    <p>The hardware for phase one consists of 3 sources of input: the joysticks analog movements along the X and Y axis, the analog value of the photocell, and the digital state of the joystick’s button. </p>
+                    <p>It also consists of 3 outputs: the laser, the pair of servo motors used to drive the pan and tilt, and the LCD display.</p>
+
+
+
+
+                    <h2>Software</h2>
 
 
 
