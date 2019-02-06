@@ -241,13 +241,65 @@
                     <p>The hardware for phase one consists of 3 sources of input: the joysticks analog movements along the X and Y axis, the analog value of the photocell, and the digital state of the joystick’s button. </p>
                     <p>It also consists of 3 outputs: the laser, the pair of servo motors used to drive the pan and tilt, and the LCD display.</p>
 
+                    <h3>Power Supply</h3>
+                    <p>Since we using an LCD shield that sits on top of the Arduino, we do not have access to the 5V power pin of the Arduino. To remedy this, we used an external power supply to provide power to all the components that would otherwise have been powered directly from the Arduino 5V pin.</p>
+                    <p>The power supply plugs directly into the wall. The jumpers are configured such that the power supply will supply 5V. One of the power pins as well as one of the ground pins are each connected to a different row of the breadboard. </p>
+                    <p>We also made a connection between the row with the power supply’s ground and one of the Arduino’s ground pins. This is to ensure that all components share the same ground reference.</p>
+                    
+                    <div>
+                        <h3>Joystick</h3>
+                        <p>The joystick’s VCC and Ground pins connect to the rows of the breadboard that are connected to the 5V output and ground of the Arduino. </p>
+                        <p>The X and Y pins of the joystick connect directly to analog input pins on the Arduino. These values can be read in directly without scaling, and show values from 0 - 1024 on each axis. </p>
+                        <p>The digital SW pin, the pin detailing the state of the joystick’s button, is not as simple to read as the analog axis pins. It must be connected to a pull-down resistor. The SW pin should connect both a 1K resistor and a digital input pin on the Arduino. The other side of the resistor should connect to 5V. </p>
+                        <p>When the button is not pressed in, the digital pin connected to the SW pin will be HIGH, since the path of least resistance is through the resistor and directly into the digital pin. When the button is pressed, the digital pin is connected to ground inside the joystick, pulling the pin reading down to LOW.</p>
 
+                        <a>
+                            <img class="img-responsive" src="img/joystick_wiring.jpg" alt="">
+                        </a>
+                        <span class="caption text-muted">Figure 1: Wiring Diagram for PS2 Joystick</span>
+                        <a>
+                            <img class="img-responsive" src="img/joystick_schema.jpg" alt="">
+                        </a>
+                        <span class="caption text-muted">Figure 2: Joystick Internal Schematic [4]</span>
+                    </div>
+
+                    <div>
+                        <h3>Photocell</h3>
+                        <p>Similar to the joystick, the photocell also requires a pull-down resistor. One side of the photocell is connected directly to the 5V pin of the Arduino. The other side is connected to a row of the breadboard that connects to both a 10K resistor, and an analog in pin on the Arduino. The other side of the 10K resistor is connected to ground. </p>
+                        <p>The resistance of the photocell in the dark is high, and it decreases as it is subjected to more light. This means that as more light hits the photocell, the total resistance of the system decreases, allowing more current to pass through into the analog in pin used to read the value of the photocell. </p>
+                        <p>OHM"S LAW</p>
+                        <a>
+                            <img class="img-responsive" src="img/photocell_wiring.jpg" alt="">
+                        </a>
+                        <span class="caption text-muted">Figure 3: Photocell Wiring Diagram</span>    
+                    </div>
+
+                    <div>
+                        <h3>Laser</h3>
+                        <p>Since the laser draws less than 20 mA, we can drive it directly from the board, making it simple to wire up. It only has two leads, a red and a black. The red lead connects to a digital out pin that will control the state of the laser, and the black lead connects to ground.</p>
+                        <a>
+                            <img class="img-responsive" src="img/laser_wiring.jpg" alt="">
+                        </a>
+                        <span class="caption text-muted">Figure 4: Laser Wiring Diagram</span>
+                    </div>
+
+                    <h3>Servo Motors</h3>
+                    <p>Each servo motor has 3 wires: brown, red, and orange. The brown wire is Ground, red is power (5V), and orange is signal. The ground and power wires are connected to the breadboard in their corresponding ground and 5V rows, and the signal wires are connected directly to PWM pins on the Arduino.</p>
+
+                    <h3>LCD Shield</h3>
+                    <p>The LCD shield plugs directly into the top of the Arduino. A couple of the pins on the shield are labeled the same as the Arduino pins, so those go together and line the rest up. </p>
+
+                    <a>
+                        <img class="img-responsive" src="img/phase1_wiring.jpg" alt="">
+                    </a>
+                    <span class="caption text-muted">Figure 5: Phase 1 Complete Wiring Diagram</span>
+                
 
 
                     <h2>Software</h2>
-
-
-
+                    <p>The code for phase 1 has 5 main tasks, two of which involve reading external values, while the other three use those values to update the state of the peripheral motors, laser, and lcd. These tasks are performed in sequence in the main Arduino loop, with a delay of 50 milliseconds at the end of each loop, to enforce a rough sampling rate of 20Hz. </p>
+                    <p></p>
+                    <p></p>
 
                     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
                     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
