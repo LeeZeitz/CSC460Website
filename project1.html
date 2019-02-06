@@ -298,9 +298,30 @@
 
                     <h2>Software</h2>
                     <p>The code for phase 1 has 5 main tasks, two of which involve reading external values, while the other three use those values to update the state of the peripheral motors, laser, and lcd. These tasks are performed in sequence in the main Arduino loop, with a delay of 50 milliseconds at the end of each loop, to enforce a rough sampling rate of 20Hz. </p>
-                    <p></p>
-                    <p></p>
+                    <p>While these tasks are performed in sequence in the phase 1 code, they are described in a modular nature here as the descriptions still apply to the phase 2 code. While theoretically fewer tasks could have been used as most operations are dependent on the sampling of the joystick values, the tasks were separated to adhere to the philosophy of the time-triggered scheduler used in phase 2.</p>
+                    <p>An initial sampling rate of 20 Hz was decided on by considering the rate at which the values of any of the peripherals could reasonably change. Since the joystick is human controlled, we decided it could only change (including the joystick’s click) 10 times per second. To be safe we doubled that, settling on a sampling rate of 20Hz. This sampling rate is tested and justified in phase 2.</p>
 
+                    <h3>Reading Joystick</h3>
+                    <p>The analog voltage for the X and Y position of the joystick is read and passed through an exponential moving-average filter. In addition, the digital value of the joystick button was read. Because of the low sample rate, no de-bouncing was needed for the button.  For the exponential filter on the joystick positions, a 90 percent weight is applied to the previous value, corresponding to a weight of 10 percent of the current value. This filter proportion is designed to maximize the smoothness of control over the motors. While no linearization was needed for project 1, some form of linearization will be necessary for project 3 to obtain more precise control of the laser attitude.</p>
+                    <p>In addition to filtering, we discarded joystick readings that were near the center of either access, creating a deadzone of approximately ∓ 25 increments in either direction. This was necessary to ensure smooth servo control as the joystick readings were noisy in this range.</p>
+
+                    <h3>Photocell</h3>
+                    <p>The second task reads the analog value of the photocell. This value is then stored for later use in another task, where it will be written to the LCD screen. After some testing, it was observed that given the resistor used (described in the hardware section of phase 1), the photocell reads ~85 in a well lit room, ~12 when it is cupped by a hand, and ~600 when a laser shines directly on it. With this information, a “hit” threshold of 350 was used to determine whether or not the photocell was being hit by a laser.</p>
+
+                    <h3>Servo Control</h3>
+                    <p>The third task is responsible for controlling the pan and tilt servo motors. It scales the filtered values read from the joystick to incremental relative position commands added to the absolute position of the servos, which is measured in degrees in the range 0 to 180. Relative control of the servos allowed for much more precise movements than absolute control would have, as the joysticks are not precise enough to achieve a specific position. The arduino Servo library was used to achieve the correct pulse width modulation necessary for servo control.</p>
+
+                    <h3>Laser Control</h3>
+                    <p>The fourth task takes the button state, decides whether the laser should be on or off, and then writes the corresponding value to the laser. It sets the laser pin HIGH if the button is pressed, and LOW if it’s not. </p>
+
+                    <h3>LCD Display</h3>
+                    <p>The fifth and final task is writing the filtered X and Y values from task 1, and the photocell reading from task 2, to the LCD display. The absolute position of the joystick in both the X and Y directions are printed on the LCD, as well as whether or not the photocell reading is above the “hit” threshold. The arduino LiquidCrystal library was used to interface with the LCD shield display.</p>
+                    <p>An issue that we encountered when programming the LCD shield was incorrect characters being rapidly printed to the screen. While this initially appeared related to the frequency of screen updates, in reality it was caused by an unnoticed buffer overflow when formating the joystick data to be printed. This bug highlights the difficulty in debugging embedded code.</p>
+
+                    
+                    
+                    
+                    
                     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
                     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
                     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
