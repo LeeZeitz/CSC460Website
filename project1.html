@@ -96,8 +96,8 @@
                 <div class="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1">
 
                     <h2 class="section-heading">Introduction</h2>
-                    <p>The objective of this project is to start familiarizing ourselves with programming real time systems using a time-based architecture, and interfacing with peripherals using an Arduino microcontroller. Some of the peripherals include photo transistors, servo motors, light emitting diodes (LED), an lcd display, and bluetooth modules.</p>
-                    <p>The goal at the end of this project is to use bluetooth communications to control two servo motors and the state of an LED connected to one microcontroller, from a joystick connected to a separate microcontroller, using a real time scheduler.</p>
+                    <p>The objective of this project is to start familiarizing ourselves with programming real time systems using a time-based architecture, and to become comfortable interfacing with peripherals using an arduino microcontroller. Some of the peripherals used in this project include photo transistors, servo motors, light emitting diodes (LED), an lcd display, and bluetooth modules.</p>
+                    <p>The goal for this project was to use bluetooth communications to control two servo motors and a laser connected to one microcontroller, from a joystick connected to a separate microcontroller, using a real time scheduler.</p>
                     <p>Although a relatively basic task, this project offers insights into the types of problems that arise when interfacing time-sensitive software with hardware components.</p>
 
                     <h2 class="section-heading">Hardware Overview</h2>
@@ -239,7 +239,7 @@
                     <p>It also consists of 3 outputs: the laser, the pair of servo motors used to drive the pan and tilt, and the LCD display.</p>
 
                     <h3>Power Supply</h3>
-                    <p>Since we using an LCD shield that sits on top of the Arduino, we do not have access to the 5V power pin of the Arduino. To remedy this, we used an external power supply to provide power to all the components that would otherwise have been powered directly from the Arduino 5V pin.</p>
+                    <p>Since we used an LCD shield that sits on top of the Arduino, we did not have access to the 5V power pin of the Arduino. To remedy this, we used an external power supply to provide power to all the components that would otherwise have been powered directly from the Arduino 5V pin.</p>
                     <p>The power supply plugs directly into the wall. The jumpers are configured such that the power supply will supply 5V. One of the power pins as well as one of the ground pins are each connected to a different row of the breadboard. </p>
                     <p>We also made a connection between the row with the power supply’s ground and one of the Arduino’s ground pins. This is to ensure that all components share the same ground reference.</p>
                     
