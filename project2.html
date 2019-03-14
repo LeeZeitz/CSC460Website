@@ -157,9 +157,7 @@
                     <p>The hardware for phase one consists of 3 sources of input: the joysticks analog movements along the X and Y axis, the analog value of the photocell, and the digital state of the joystick’s button. </p>
                     <p>It also consists of 3 outputs: the laser, the pair of servo motors used to drive the pan and tilt, and the LCD display.</p>
 
-
                     <h2 class="section-heading" id="testing">Testing</h2>
-
                     <p>A series of test cases were constructed to fully test the TTA features outlined above. Each case is presented with a brief description, the expected scheduling result and a screenshot of actual scheduling shown on a logic analyzer.</p>
 
                     <h3>Test 1<h3>
@@ -170,7 +168,7 @@
                     <h4>Expected Results</h4>
                     <p>This should run with no problems. The logic analyzer should show 4 periodic tasks with minimal to no jitter.</p>
                     <h4>Observed Results</h4>
-                    <p></p>
+                    <p>The logic analyzer showed (Figure 3) 4 periodic tasks repeating with no jitter.</p>
                     <div>
                         <a>
                             <img class="img-responsive" style="width:800px" src="img/test1.png" alt="">
@@ -186,14 +184,13 @@
                     <h4>Expected Results</h4>
                     <p>This should run with no problems. The logic analyzer should show 2 periodic tasks with minimal jitter. When a sporadic task is triggered, it should fall into the idle time between periodic task executions. It should not introduce any jitter to the periodic tasks.</p>
                     <h4>Observed Results</h4>
-                    <p></p>
+                    <p>The logic analyzer showed (Figure 4) 2 periodic tasks with a sporadic tasks occuring during the scheduler's idle time.</p>
                     <div>
                         <a>
                             <img class="img-responsive" style="width:800px" src="img/test2.png" alt="">
                         </a>
                         <span class="caption text-muted">Figure 4: Test 2 Results</span>
                     </div>
-
 
                     <h3>Test 3<h3>
                     <h4>Test Case</h4>
@@ -204,14 +201,13 @@
                     <h4>Expected Results</h4>
                     <p>The periodic tasks should run with no jitter. The sporadic tasks should run in between the sporadic tasks when there is enough idle time to complete them before the next periodic tasks. The logic analyzer should show two periodic tasks with one sporadic task repeating, but getting further and further apart.</p>
                     <h4>Observed Results</h4>
-                    <p></p>
+                    <p>The logic anaylzer showed (Figure 5) 2 periodic tasks with multiple sporadic tasks repeating in the idle periods, but never introducing jitter to the periodic tasks.</p>
                     <div>
                         <a>
                             <img class="img-responsive" style="width:800px" src="img/test3.png" alt="">
                         </a>
                         <span class="caption text-muted">Figure 5: Test 3 Results</span>
                     </div>
-                    
                     
                     <h3>Test 4<h3>
                     <h4>Test Case</h4>
@@ -221,14 +217,13 @@
                     <h4>Expected Results</h4>
                     <p>The OS should recognize this is an invalid schedule and display an error message on the LCD screen and hang. The logic analyzer should show two of the periodic tasks running correctly, with the other one shifted the duration of the first tasks off its period. This should only show for a short period of time, when the scheduler should hang and the logic analyzer should show nothing.</p>
                     <h4>Observed Results</h4>
-                    <p></p>
+                    <p>The logic analyer showed (Figure 6) significant jitter in one of three periodic tasks, followed by the scheduler hanging.</p>
                     <div>
                         <a>
                             <img class="img-responsive" style="width:800px" src="img/test4.png" alt="">
                         </a>
                         <span class="caption text-muted">Figure 6: Test 4 Results</span>
                     </div>                    
-                    
                     
                     <h3>Test 5<h3>
                     <h4>Test Case</h4>
@@ -238,14 +233,13 @@
                     <h4>Expected Results</h4>
                     <p>The sporadic task should run before the idle task.</p>
                     <h4>Observed Results</h4>
-                    <p></p>
+                    <p>The logic analyzer showed (Figure 7) the sporadic (shorter) task running before the idle (longer) task.</p>
                     <div>
                         <a>
                             <img class="img-responsive" style="width:800px" src="img/test5.png" alt="">
                         </a>
                         <span class="caption text-muted">Figure 7: Test 5 Results</span>
                     </div>
-                    
 
                     <h3>Test 6<h3>
                     <h4>Test Case</h4>
@@ -255,14 +249,13 @@
                     <h4>Expected Results</h4>
                     <p>This should run with no problems. The logic analyzer should show 2 periodic tasks with minimal jitter. When a sporadic task is triggered, it should cause jitter in the periodic tasks as the actual run time (10ms) is larger than the expected runtime (2ms). The scheduler should be able to recover from this. If the button is pressed repeatedly (causing frequent interrupts), there will be too much error and the scheduler will detect this and hang.</p>
                     <h4>Observed Results</h4>
-                    <p></p>
+                    <p>The logic analyzer showed (Figure 8) 2 periodic tasks with occasional jitter caused by a sporadic task being scheduled too close to the beginning of a periodic task.</p>
                     <div>
                         <a>
                             <img class="img-responsive" style="width:800px" src="img/test6.png" alt="">
                         </a>
                         <span class="caption text-muted">Figure 8: Test 6 Results</span>
                     </div>                    
-
 
                     <h3>Test 7<h3>
                     <h4>Test Case</h4>
@@ -272,7 +265,7 @@
                     <h4>Expected Results</h4>
                     <p>The sporadic tasks should be completed in a first in-first out (FIFO) order, unless they are triggered at a time where the schedule determines that based on the estimated durations it does not have enough idle time before the next periodic tasks to complete the next sporadic task, but does have enough time to complete a later sporadic task. In this case, the later sporadic task should be run first.</p>
                     <h4>Observed Results</h4>
-                    <p></p>
+                    <p>The logic analyzer showed (Figure 9) two periodic tasks running and three non-periodic tasks running, of which the shortest (last scheduled) ran first, followed by the longest (first scheduled) and then the middle (second scheduled) tasks, where there would not have been time to run either of the longer two before a periodic task, but there was time to run the shortest one.</p>
                     <div>
                         <a>
                             <img class="img-responsive" style="width:800px" src="img/test7.png" alt="">
@@ -288,7 +281,7 @@
                     <h4>Expected Results</h4>
                     <p>The 2 periodic tasks should experience no jitter, and the sporadic tasks should fill the majority of the idle time between periodic tasks.</p>
                     <h4>Observed Results</h4>
-                    <p></p>
+                    <p>The logic analyzer showed (Figure 10) two periodic tasks with no jitter, where the idle space between them was filled by recursive sporadic tasks. The sporadic tasks did not interfere with the periods.</p>
                     <div>
                         <a>
                             <img class="img-responsive" style="width:800px" src="img/test8.png" alt="">
