@@ -77,11 +77,39 @@
             <div class="row">
                 <div class="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1">
 
-                    <h2 class="section-heading">Introduction</h2>
+                    <h2 class="section-heading">Table of Contents</h2>
+                    <div id="table-of-contents">
+                        <div class="table-of-contents">
+                            <a href="#introduction">Introduction</a>
+                        </div>
+                        <div class="table-of-contents">
+                            <a href="#hardware">Hardware</a>
+                        </div>
+                        <div class="table-of-contents">
+                            <a href="#software">Software: Enhanced TTA Scheduler</a>
+                        </div>
+                        <div class="table-of-contents">
+                            <a href="#testing">Testing</a>
+                        </div>
+                        <div class="table-of-contents">
+                            <a href="#conclusion">Conclusion</a>
+                        </div>
+                        <div class="table-of-contents">
+                            <a href="#observations">Observations and Future Improvements</a>
+                        </div>
+                        <div class="table-of-contents">
+                            <a href="#appendixa">Appendix A: Source Code</a>
+                        </div>
+                        <div class="table-of-contents">
+                            <a href="appendixb">Appendix B: Hardware Configuration</a>
+                        </div>
+                    </div>
+
+                    <h2 class="section-heading" id="introduction">Introduction</h2>
                     <p>Project 2 of the CSC 460 Real Time Operating Systems (RTOS) course involved designing and implementing a time triggered architecture (TTA) based scheduler. A TTA scheduler is simple way to implement an RTOS that strips away many of the complex features of a priority-based RTOS such as context switching and inter-process communication. As a result of its simplicity, it also lacks some of the flexibility that comes with these more advanced real time operating systems. However, these features introduce safety and reliability concerns, as they are difficult to implement and difficult for programers to use correctly. Without these complex components, TTAs are safe, reliable, and simple to implement.</p>
                     <p>Our task for project 2 was to extend the TTA scheduler provided for project 1 to include support for Interrupts, dynamically created tasks and multiple task instances. In particular, our solution was required to dynamically schedule new tasks without interfering with any existing periodic tasks.</p>
 
-                    <h2 class="section-heading">Hardware</h2>
+                    <h2 class="section-heading" id="hardware">Hardware</h2>
                     <p>There were three pieces of hardware used in developing the TTA scheduler for Project 2, including an Arduino Mega 2560, Arduino LCD shield, and a pushbutton. A wiring diagram of this hardware is shown in Figure 1.</p>
                     <div>
                         <a>
@@ -90,7 +118,7 @@
                         <span class="caption text-muted">Figure 1: Hardware Wiring Diagram</span>
                     </div>
                     
-                    <h2 class="section-heading">Software: Enhanced TTA Scheduler</h2>
+                    <h2 class="section-heading" id="software">Software: Enhanced TTA Scheduler</h2>
                     <p>The objective of project 2 was to modify the TTA scheduler from first project to support the features necessary for project 3, which will involve control of the roomba. The primary limitation of the scheduler from project 1 was its lack of support for urgent or dynamically created tasks and its reliance on the Arduino library for timing. As outlined in class, a RTOS must be able to respond to external events (interrupts) in a timely manner without affecting the execution of critical periodic tasks. Our solutions to these problems are outlined below.</p>
                     <code>uint8_t os_add_periodic_task(uint16_t delay_ms, uint16_t period_ms, task_cb task, void *state);</code>
                     <p>The API call for the addition of periodic task is largely unchanged from project 1. The function <code>Scheduler_StartTask</code> from the original scheduler has been renamed to <code>os_add_periodic_task</code>, the full details of which are shown above. The only additional parameter is a state struct used to create multiple instances of the same task. The details of this functionality is explained in the section “Task Instances”.</p>
@@ -130,7 +158,7 @@
                     <p>It also consists of 3 outputs: the laser, the pair of servo motors used to drive the pan and tilt, and the LCD display.</p>
 
 
-                    <h2 class="section-heading">Testing</h2>
+                    <h2 class="section-heading" id="testing">Testing</h2>
 
                     <p>A series of test cases were constructed to fully test the TTA features outlined above. Each case is presented with a brief description, the expected scheduling result and a screenshot of actual scheduling shown on a logic analyzer.</p>
 
@@ -268,16 +296,16 @@
                         <span class="caption text-muted">Figure 10: Test 8 Results</span>
                     </div>
                     
-                    <h2 class="section-heading">Conclusion</h2>
+                    <h2 class="section-heading" id="conclusion">Conclusion</h2>
                     <p>The test cases described above show that the TTA scheduler met the requirements for project 2. Specifically, our scheduler was able to respond to interrupts in order to add and delete tasks dynamically, without interfering with the scheduling of any of the periodic tasks. Clearly, a TTA scheduler provides a viable, simple alternative to the traditional priority-based RTOS that was seen in the lab.</p>
 
-                    <h2 class="section-heading">Observations and Future Improvements</h2>
+                    <h2 class="section-heading" id="observations">Observations and Future Improvements</h2>
                     <p>While disabling interrupts during timing-critical tasks provided extremely deterministic scheduling performance for project 2, it may be unnecessary for project 3. With careful programming, ISRs can be kept extremely short and free of race conditions; they can simply exist to schedule dynamic tasks for some time in the future. Short ISRs would likely not introduce any significant jitter into the currently executing critical task. Furthermore, having the OS schedule dynamic tasks immediately may provide better scheduling performance.</p>
 
-                    <h2 class="section-heading">Appendix A: Source Code</h2>
+                    <h2 class="section-heading" id="appendixa">Appendix A: Source Code</h2>
                     <a href="https://github.com/eferri/csc460project/tree/master/project2" target="blank" style="color: blue">Click here</a><span> to see our source code</span>
 
-                    <h2 class="section-heading">Appendix B: Hardware Configuration</h2>
+                    <h2 class="section-heading" id="appendixb">Appendix B: Hardware Configuration</h2>
                     <a>
                         <img class="img-responsive" style="width:800px;transform:rotate(270deg);" src="img/project2-overview.jpg" alt="">
                     </a>
