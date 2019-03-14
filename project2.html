@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" type="image/gif" href="./img/clock.gif"/>
+
+
+    <title>Project 2</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Theme CSS -->
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+   <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="index.html" style="color:black">Home</a>
+                    </li>
+                    <li>
+                        <a href="about.html" style="color:black">About</a>
+                    </li>
+                    <li>
+                        <a href="project1.html" style="color:black">Project 1</a>
+                    </li>
+                    <li>
+                        <a href="project2.html" style="color:black">Project 2</a>
+                    </li>
+                    <li>
+                        <a href="project3.html" style="color:black">Project 3</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('img/clock.gif'); background-size: auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="post-heading">
+                        <h1 style="background-color: black">Project 2</h1>
+                        <h2 class="subheading" style="background-color: black">What time IS it?</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Post Content -->
+    <article>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1">
+
+                    <h2 class="section-heading">Introduction</h2>
+                    <p>Project 2 of the CSC 460 Real Time Operating Systems (RTOS) course involved designing and implementing a time triggered architecture (TTA) based scheduler. A TTA scheduler is simple way to implement an RTOS that strips away many of the complex features of a priority-based RTOS such as context switching and inter-process communication. As a result of its simplicity, it also lacks some of the flexibility that comes with these more advanced real time operating systems. However, these features introduce safety and reliability concerns, as they are difficult to implement and difficult for programers to use correctly. Without these complex components, TTAs are safe, reliable, and simple to implement.</p>
+                    <p>Our task for project 2 was to extend the TTA scheduler provided for project 1 to include support for Interrupts, dynamically created tasks and multiple task instances. In particular, our solution was required to dynamically schedule new tasks without interfering with any existing periodic tasks.</p>
+
+                    <h2 class="section-heading">Hardware</h2>
+                    <p>There were three pieces of hardware used in developing the TTA scheduler for Project 2, including an Arduino Mega 2560, Arduino LCD shield, and a pushbutton. A wiring diagram of this hardware is shown in Figure 1.</p>
+                    <div>
+                        <a>
+                            <img class="img-responsive" src="img/button-interrupt.jpg" alt="">
+                        </a>
+                        <span class="caption text-muted">Figure 1: Hardware Wiring Diagram</span>
+                    </div>
+                    
+                    <h2 class="section-heading">Software: Enhanced TTA Scheduler</h2>
+                    <p>The objective of project 2 was to modify the TTA scheduler from first project to support the features necessary for project 3, which will involve control of the roomba. The primary limitation of the scheduler from project 1 was its lack of support for urgent or dynamically created tasks and its reliance on the Arduino library for timing. As outlined in class, a RTOS must be able to respond to external events (interrupts) in a timely manner without affecting the execution of critical periodic tasks. Our solutions to these problems are outlined below.</p>
+                    <code>uint8_t os_add_periodic_task(uint16_t delay_ms, uint16_t period_ms, task_cb task, void *state);</code>
+                    <p>The API call for the addition of periodic task is largely unchanged from project 1. The function <code>Scheduler_StartTask</code> from the original scheduler has been renamed to <code>os_add_periodic_task</code>, the full details of which are shown above. The only additional parameter is a state struct used to create multiple instances of the same task. The details of this functionality is explained in the section “Task Instances”.</p>
+
+
+                    <h2>OS Timing and Interrupts</h2>
+                    <p>In order to maintain the deterministic behaviour of the TTA scheduler and to avoid any potential race conditions, interrupts were disabled during the execution of any periodic or timing-critical tasks. This way, there is no possibility of an interrupt service routine affecting the timing of a periodic task. As outlined in the project 2 description, the expected execution time of tasks in our roomba application and overall cpu utilization are relatively small, and therefore disabling interrupts for the entire execution period is acceptable. Any interrupt that does occur during the execution of a timing-critical task will have be handled by its appropriate ISR immediately after the scheduler re-enables interrupts using the SREG register.</p>
+                    <p>Disabling interrupts during periodic tasks presented an unexpected challenge when attempting to maintain a consistent and correct dispatch schedule. This was because the original TTA scheduler used the arduino library function “millis()” to keep track of it’s execution time, which in turned relied on a configured ISR to update an internal counter for the total number of elapsed milliseconds. This means that if a timing-critical task ran for longer than a millisecond (during which interrupts are disabled), OS timing could be affected. </p>
+                    <div>
+                        <a>
+                            <img class="img-responsive" style="width:700px" src="img/timing-diagram.png" alt="">
+                        </a>
+                        <span class="caption text-muted">Figure 2: TTA Timer Architecture</span>
+                    </div>
+
+                    <p>In order to correct this, a hardware-based timing solution was devised. As the prescalers on the for the 16-bit AVR timers are not suited for counting milliseconds directly, two timers were used in combination to directly count milliseconds with a suitably long roll-over period. Timer 3 was configured to CTC mode (clear timer on compare) to generate an external clock signal with a period of 1 ms. This was then connected with a hardware wire to Timer 5, which was configured to count this external input. In this way, our “millis()” function simply read the 16-bit timer register TCNT5 to determine the number of elapsed milliseconds, which was updated by the AVR timer hardware without any interrupts. Figure 2 provides a block diagram for this timer setup.</p>
+
+                    <h2>Dynamic Tasks</h2>
+                    <p>Our enhanced TTA added support for two types of non-periodic tasks that can dynamically added from any part of the code, including an ISR. The first are sporadic tasks which have an desired start time given as an offset from the time the function “os_add_sporadic_task()” is called. Our TTA scheduler will try to run the given task as close to this time as possible, but will delay further if this time conflicts with the scheduling of a periodic task. The second type of dynamic tasks are idle tasks, which do not have an associated start time and are run as soon as possible. Note that the scheduler will run all ready periodic and sporadic tasks before attempting to run an idle (background) task. This means that in our operating system, a sporadic task with a delay of zero has a higher priority than an idle task. </p>
+                    <p>For both types of tasks, the scheduler will automatically delete the task from its internal queue after it has been run once. The API functions to add each type of task are given below. As before, a state struct can be provided in order to run multiple instances of the same task.</p>
+                    <code>uint8_t os_add_sporadic_task(uint16_t delay_ms, uint32_t duration_us, task_cb task, void *state);</code>
+                    <code>uint8_t os_add_idle_task(uint32_t duration_us, task_cb task, void *state);</code>
+                    <p>Note that both functions accept an integer argument “duration_us”. This argument is the estimated execution time of the task provided by the programmer to the scheduler. This is used by the scheduler to determine if it has enough time to run a given dynamic task between other scheduled periodic and sporadic tasks. In general, the scheduler will run dynamic tasks of the same priority (i.e. sporadic versus idle) in FIFO order, but may run a later task earlier if it is able to due to shorter expected duration.</p>
+                    <p>It is critical that the programmer provide accurate duration estimates of any dynamic tasks to the scheduler. Estimates that are excessively large will cause the scheduler to wait too long to run the task. Estimates that are too short may cause the dynamic task to conflict with a scheduled periodic task, causing jitter.</p>
+                    
+                    <h2>Task Instances</h2>
+                    <p>As outlined above, each scheduler API call accepts a pointer to a “state” struct, that stores information used by the specific instance of the task callback “task”. In this way, the same task callback can be used for multiple instances of the task that maintain different state. The use of a void pointer type makes the struct generic in the scheduler API; each task callback is responsible for casting the struct to the appropriate type.</p>
+                    <code>typedef void (*task_cb)(void *state);</code>
+                    <p>The type of the task function pointer “task_cb” was updated to match the addition of this state structure. As shown above, each task callback now expects the state structure as a single argument when it is called by the scheduler.</p>
+                    
+                    <h2>Error Handling</h2>
+                    <p>The last critical feature that was added to the TTA scheduler was the ability to detect and respond to timing jitter. In the case of infrequent jitter caused by a single long-running task (either periodic, sporadic or idle), the provided code from project 1 is already able to correct itself and resume the proper periodic schedule. However, there was no way to detect how much jitter was occuring, or determine when a given amount of jitter was unrecoverable.</p>
+                    <p>To support these features, we added variables that calculate and accumulate the total jitter detected across all periodic tasks. Timing jitter was defined as the difference between the scheduled time and the time when the task was actually run. If this total jitter passed a predefined allowable jitter, the scheduler was configured to hang and return an error status. Note that this accumulated jitter is reset every second as the scheduler may need to run for a long period of time.</p>
+
+                    <h2>Hardware</h2>
+                    <p>The hardware for phase one consists of 3 sources of input: the joysticks analog movements along the X and Y axis, the analog value of the photocell, and the digital state of the joystick’s button. </p>
+                    <p>It also consists of 3 outputs: the laser, the pair of servo motors used to drive the pan and tilt, and the LCD display.</p>
+
+
+                    <h2 class="section-heading">Testing</h2>
+
+                    <p>A series of test cases were constructed to fully test the TTA features outlined above. Each case is presented with a brief description, the expected scheduling result and a screenshot of actual scheduling shown on a logic analyzer.</p>
+
+                    <h3>Test 1<h3>
+                    <h4>Test Case</h4>
+                    <p>Valid schedule with 4 periodic tasks.</p>
+                    <h4>Description</h4>
+                    <p>This test case runs 4 periodic tasks. The periodic tasks have offsets of 0, 5, 10, 15 ms, durations of 4, 1, 3, 3 ms, and periods of 20ms. These tasks are scheduled such that they should run simultaneously with no jitter</p>
+                    <h4>Expected Results</h4>
+                    <p>This should run with no problems. The logic analyzer should show 4 periodic tasks with minimal to no jitter.</p>
+                    <h4>Observed Results</h4>
+                    <p></p>
+                    <div>
+                        <a>
+                            <img class="img-responsive" style="width:800px" src="img/test1.png" alt="">
+                        </a>
+                        <span class="caption text-muted">Figure 3: Test 1 Results</span>
+                    </div>
+                    
+                    <h3>Test 2<h3>
+                    <h4>Test Case</h4>
+                    <p>Valid schedule with 2 periodic tasks and interrupt triggering sporadic tasks.</p>
+                    <h4>Description</h4>
+                    <p>This test case runs 2 periodic tasks with an interrupt triggering an idle sporadic task. The periodic tasks have offsets of 0 and 5 ms, durations of 4 and 1 ms, and periods of 20ms. Pressing a button triggers an interrupt which schedules a sporadic task with delay 0, meaning it should start as soon as possible.</p>
+                    <h4>Expected Results</h4>
+                    <p>This should run with no problems. The logic analyzer should show 2 periodic tasks with minimal jitter. When a sporadic task is triggered, it should fall into the idle time between periodic task executions. It should not introduce any jitter to the periodic tasks.</p>
+                    <h4>Observed Results</h4>
+                    <p></p>
+                    <div>
+                        <a>
+                            <img class="img-responsive" style="width:800px" src="img/test2.png" alt="">
+                        </a>
+                        <span class="caption text-muted">Figure 4: Test 2 Results</span>
+                    </div>
+
+
+                    <h3>Test 3<h3>
+                    <h4>Test Case</h4>
+                    <p>Varying Sporadic Tasks</p>
+                    <h4>Description</h4>
+                    <p>This test case spawns two periodic tasks, one with offset 0ms, duration 4ms, and frequency 20ms, the other with offset 5ms, duration 1ms, and frequency 20ms. When the button is pressed it triggers a sporadic task with delay 0ms and duration 2ms. This means that the sporadic task should run as soon as there is enough idle time between periodic tasks for it to complete given its duration. In this case, the sporadic task schedules another sporadic task with a delay equal to the number of times the sporadic task has already been scheduled. As the instances of the sporadic tasks grow further apars, it will eventually force a conflict between them and the periodic tasks, forcing the scheduler to determine which task should run. It also tests the scheduler's ability to calculate remaining idle time and compare it to the estimated duration of a sporadic task.</p>
+                    <p>This test case also tests the functionality of providing a sporadic task with a delay, such that it does not run immediately but instead runs in the future after some specified time.</p>
+                    <h4>Expected Results</h4>
+                    <p>The periodic tasks should run with no jitter. The sporadic tasks should run in between the sporadic tasks when there is enough idle time to complete them before the next periodic tasks. The logic analyzer should show two periodic tasks with one sporadic task repeating, but getting further and further apart.</p>
+                    <h4>Observed Results</h4>
+                    <p></p>
+                    <div>
+                        <a>
+                            <img class="img-responsive" style="width:800px" src="img/test3.png" alt="">
+                        </a>
+                        <span class="caption text-muted">Figure 5: Test 3 Results</span>
+                    </div>
+                    
+                    
+                    <h3>Test 4<h3>
+                    <h4>Test Case</h4>
+                    <p>Invalid schedule</p>
+                    <h4>Description</h4>
+                    <p>This test case schedules 3 periodic tasks, two of which start at the same time. Since only one task can run at a time, this schedule guarantees there will be jitter in at least one of the tasks every period. </p>
+                    <h4>Expected Results</h4>
+                    <p>The OS should recognize this is an invalid schedule and display an error message on the LCD screen and hang. The logic analyzer should show two of the periodic tasks running correctly, with the other one shifted the duration of the first tasks off its period. This should only show for a short period of time, when the scheduler should hang and the logic analyzer should show nothing.</p>
+                    <h4>Observed Results</h4>
+                    <p></p>
+                    <div>
+                        <a>
+                            <img class="img-responsive" style="width:800px" src="img/test4.png" alt="">
+                        </a>
+                        <span class="caption text-muted">Figure 6: Test 4 Results</span>
+                    </div>                    
+                    
+                    
+                    <h3>Test 5<h3>
+                    <h4>Test Case</h4>
+                    <p>Sporadic and Idle Task Conflic</p>
+                    <h4>Description</h4>
+                    <p>A sporadic task and an idle (background) task are scheduled to start at the same time. Since idle tasks have no specified running time associated with them (i.e they just run as soon as possible), and sporadic tasks do have a specified time to run, the sporadic tasks should be given precedence over the idle task and run first.</p>
+                    <h4>Expected Results</h4>
+                    <p>The sporadic task should run before the idle task.</p>
+                    <h4>Observed Results</h4>
+                    <p></p>
+                    <div>
+                        <a>
+                            <img class="img-responsive" style="width:800px" src="img/test5.png" alt="">
+                        </a>
+                        <span class="caption text-muted">Figure 7: Test 5 Results</span>
+                    </div>
+                    
+
+                    <h3>Test 6<h3>
+                    <h4>Test Case</h4>
+                    <p>Valid schedule with interrupt causing occasional jitter</p>
+                    <h4>Description</h4>
+                    <p>Two periodic tasks run with periods of 20 ms. A long, sporadic task is scheduled via an interrupt. The duration of the sporadic task is set to 2ms, but the actual running duration of it is 10ms. This causes the scheduler to attempt to run the task in the idle time before one of the periodic tasks because it thinks there is enough idle time to complete it. When the sporadic task exceeds its duration it will cause jitter in the periodic task. The amount of jitter introduced should be under the tolerable and recoverable amount, so the scheduler should make up, continue, and recover the periods of the periodic tasks.</p>
+                    <h4>Expected Results</h4>
+                    <p>This should run with no problems. The logic analyzer should show 2 periodic tasks with minimal jitter. When a sporadic task is triggered, it should cause jitter in the periodic tasks as the actual run time (10ms) is larger than the expected runtime (2ms). The scheduler should be able to recover from this. If the button is pressed repeatedly (causing frequent interrupts), there will be too much error and the scheduler will detect this and hang.</p>
+                    <h4>Observed Results</h4>
+                    <p></p>
+                    <div>
+                        <a>
+                            <img class="img-responsive" style="width:800px" src="img/test6.png" alt="">
+                        </a>
+                        <span class="caption text-muted">Figure 8: Test 6 Results</span>
+                    </div>                    
+
+
+                    <h3>Test 7<h3>
+                    <h4>Test Case</h4>
+                    <p>Sporadic Task FIFO</p>
+                    <h4>Description</h4>
+                    <p>This test case has 2 periodic tasks running, with an interrupt caused by a button press that schedules 3 sporadic tasks all with delay 0. The two sporadic tasks scheduled first are of the same length, and have estimated durations of 11ms and 9ms. The third sporadic tasks has an estimated duration of 1ms.</p>
+                    <h4>Expected Results</h4>
+                    <p>The sporadic tasks should be completed in a first in-first out (FIFO) order, unless they are triggered at a time where the schedule determines that based on the estimated durations it does not have enough idle time before the next periodic tasks to complete the next sporadic task, but does have enough time to complete a later sporadic task. In this case, the later sporadic task should be run first.</p>
+                    <h4>Observed Results</h4>
+                    <p></p>
+                    <div>
+                        <a>
+                            <img class="img-responsive" style="width:800px" src="img/test7.png" alt="">
+                        </a>
+                        <span class="caption text-muted">Figure 9: Test 7 Results</span>
+                    </div>
+                    
+                    <h3>Test 8<h3>
+                    <h4>Test Case</h4>
+                    <p>Constant Idle Tasks</p>
+                    <h4>Description</h4>
+                    <p>This test case has 2 periodic tasks running, and when those two tasks are idle, it is to run a sporadic tasks that schedules itself again with a delay of 0. This test is designed to ensure that even with constant idle and sporadic tasks being scheduled, the scheduler will not introduce jitter into the periods of the periodic tasks, and will respect their priority.</p>
+                    <h4>Expected Results</h4>
+                    <p>The 2 periodic tasks should experience no jitter, and the sporadic tasks should fill the majority of the idle time between periodic tasks.</p>
+                    <h4>Observed Results</h4>
+                    <p></p>
+                    <div>
+                        <a>
+                            <img class="img-responsive" style="width:800px" src="img/test8.png" alt="">
+                        </a>
+                        <span class="caption text-muted">Figure 10: Test 8 Results</span>
+                    </div>
+                    
+                    <h2 class="section-heading">Conclusion</h2>
+                    <p>The test cases described above show that the TTA scheduler met the requirements for project 2. Specifically, our scheduler was able to respond to interrupts in order to add and delete tasks dynamically, without interfering with the scheduling of any of the periodic tasks. Clearly, a TTA scheduler provides a viable, simple alternative to the traditional priority-based RTOS that was seen in the lab.</p>
+
+                    <h2 class="section-heading">Observations and Future Improvements</h2>
+                    <p>While disabling interrupts during timing-critical tasks provided extremely deterministic scheduling performance for project 2, it may be unnecessary for project 3. With careful programming, ISRs can be kept extremely short and free of race conditions; they can simply exist to schedule dynamic tasks for some time in the future. Short ISRs would likely not introduce any significant jitter into the currently executing critical task. Furthermore, having the OS schedule dynamic tasks immediately may provide better scheduling performance.</p>
+
+                    <h2 class="section-heading">Appendix A: Source Code</h2>
+                    <a href="https://github.com/eferri/csc460project/tree/master/project2" target="blank" style="color: blue">Click here</a><span> to see our source code</span>
+
+                    <h2 class="section-heading">Appendix B: Hardware Configuration</h2>
+                    <a>
+                        <img class="img-responsive" style="width:800px;transform:rotate(270deg);" src="img/project2-overview.jpg" alt="">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Contact Form JavaScript -->
+    <script src="js/jqBootstrapValidation.js"></script>
+    <script src="js/contact_me.js"></script>
+
+    <!-- Theme JavaScript -->
+    <script src="js/clean-blog.min.js"></script>
+
+</body>
+
+</html>
